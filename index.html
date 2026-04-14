@@ -195,15 +195,22 @@ section{position:relative}
   text-align:center;color:var(--amber);font-family:var(--heading);
   font-size:clamp(0.75rem,2vw,0.9rem);letter-spacing:0.2em;margin-bottom:2.5rem
 }
-.transport-timeline{position:relative;max-width:500px;margin:0 auto;padding-left:2.5rem}
-.tl-svg{position:absolute;left:0.6rem;top:0;width:2px;height:100%}
+.transport-timeline{position:relative;max-width:500px;margin:0 auto;padding-left:40px}
+.tl-svg{position:absolute;left:18px;top:11px;width:2px;height:calc(100% - 11px);transform:translateX(-50%)}
 .tl-bg{stroke:var(--stone);stroke-width:2}
 .tl-fill{stroke:var(--amber);stroke-width:2;stroke-linecap:round}
 .t-stop{position:relative;padding-bottom:2rem}
 .t-stop:last-child{padding-bottom:0}
+.t-stop:first-child::before,
+.t-stop:last-child::after{
+  content:'';position:absolute;left:-26px;width:10px;background:var(--bg2);z-index:1;pointer-events:none;
+}
+.t-stop:first-child::before{top:0;height:4px}
+.t-stop:last-child::after{top:14px;bottom:0}
 .t-dot{
-  position:absolute;left:-2.2rem;top:0.25rem;width:10px;height:10px;border-radius:50%;
-  background:var(--bg2);border:2px solid var(--stone);z-index:2;transition:all .5s
+  position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;
+  background:var(--bg2);border:2px solid var(--stone);z-index:2;
+  transform:translateX(-50%);transition:border-color .5s,background .5s,box-shadow .5s
 }
 .t-stop.active .t-dot{border-color:var(--amber);background:var(--amber);box-shadow:0 0 10px rgba(196,125,46,0.5)}
 .t-name{font-family:var(--heading);font-size:clamp(0.95rem,2.5vw,1.1rem);font-weight:700;color:var(--bone)}
@@ -500,7 +507,7 @@ section{position:relative}
     <h2 class="transport-title reveal">Train Only</h2>
     <p class="transport-depart reveal" data-ru="Выезд: 05:30 от Shinjuku" data-en="Departure: 05:30 from Shinjuku">Выезд: 05:30 от Shinjuku</p>
     <div class="transport-timeline">
-      <svg class="tl-svg" style="position:absolute;left:0.6rem;top:0;width:2px;height:100%">
+      <svg class="tl-svg">
         <line class="tl-bg" x1="1" y1="0" x2="1" y2="100%"/>
         <line class="tl-fill" x1="1" y1="0" x2="1" y2="0%" id="tl-prog"/>
       </svg>
