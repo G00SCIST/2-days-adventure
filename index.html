@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KUMOTORI — 2 Days Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET ========== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:#0a0a08;color:#e8dcc8;
+  font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;line-height:1.6;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;height:auto;display:block}
+a{color:#d4a954;text-decoration:none}
+
+/* ========== VARIABLES ========== */
+:root{
+  --bg:#0a0a08;--bg2:#12100e;--card:#1a1714;
+  --stone:#3d3529;--earth:#5c4a32;--amber:#c47d2e;--ember:#e8622b;
+  --gold:#d4a954;--bone:#e8dcc8;--moss:#4a5e3a;--fog:#8a8070;
+  --display:'Cinzel Decorative','Cinzel',serif;
+  --heading:'Cinzel',serif;
+  --body:'Cormorant Garamond',Georgia,serif;
+}
+
+/* ========== GLOBAL ========== */
+.container{width:100%;max-width:1100px;margin:0 auto;padding:0 24px}
+@media(min-width:1440px){.container{max-width:1200px}}
+section{position:relative}
+.reveal{opacity:0;transform:translateY(30px)}
+.section-label{
+  font-family:var(--heading);font-size:0.75rem;letter-spacing:0.35em;
+  text-transform:uppercase;color:var(--amber);margin-bottom:1rem;text-align:center;
+}
+
+/* ========== LANG TOGGLE ========== */
+.lang-toggle{
+  position:fixed;top:1.2rem;right:1.2rem;z-index:1000;
+  background:rgba(26,23,20,0.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border:1px solid var(--stone);padding:0.35rem 0.7rem;cursor:pointer;
+  font-family:var(--heading);font-size:0.7rem;letter-spacing:0.2em;
+  color:var(--fog);text-transform:uppercase;transition:all .3s;
+}
+.lang-toggle:hover{border-color:var(--amber);color:var(--bone)}
+.lang-toggle .active-lang{color:var(--gold)}
+
+/* ========== CAVE DECORATIONS ========== */
+.cave-decor{position:absolute;pointer-events:none;z-index:0}
+.cave-decor svg{width:100%;height:100%}
+.cave-decor.faint{opacity:0.06}
+.cave-decor.soft{opacity:0.1}
+.cave-decor.visible{opacity:0.14}
+.cave-panel{
+  position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;opacity:0.07;
+}
+.cave-panel img{
+  width:100%;height:100%;object-fit:cover;
+  filter:sepia(1) brightness(0.4) contrast(1.2);mix-blend-mode:lighten;
+}
+
+/* ========== HERO ========== */
+.hero{
+  position:relative;min-height:100dvh;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;
+}
+.hero-video-wrap{position:absolute;inset:0;z-index:0}
+.hero-video-wrap video{width:100%;height:100%;object-fit:cover}
+.hero-poster{
+  display:none;position:absolute;inset:0;
+  background:linear-gradient(135deg,#1a1510,#0a0a08 40%,#1a1208);
+}
+.hero-overlay{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(to bottom,rgba(10,10,8,0.35)0%,rgba(10,10,8,0.55)50%,rgba(10,10,8,0.92)100%);
+}
+.hero-content{position:relative;z-index:2;padding:2rem 1.5rem}
+.hero-pretitle{
+  font-family:var(--heading);font-size:0.7rem;letter-spacing:0.6em;
+  text-transform:uppercase;color:var(--amber);margin-bottom:1.2rem;opacity:0
+}
+.hero-title{
+  font-family:var(--display);font-weight:900;
+  font-size:clamp(3rem,10vw,7.5rem);
+  color:var(--bone);margin-bottom:0.3rem;opacity:0;transform:scale(1.3);
+  text-shadow:0 0 60px rgba(196,125,46,0.25);
+}
+.hero-subtitle{
+  font-family:var(--body);font-size:clamp(0.95rem,2.5vw,1.25rem);
+  color:var(--fog);letter-spacing:0.12em;opacity:0
+}
+.hero-subtitle span{display:inline-block;margin:0 0.35em}
+.hero-scroll{
+  position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:2;
+  display:flex;flex-direction:column;align-items:center;gap:0.4rem;opacity:0
+}
+.hero-scroll span{font-family:var(--heading);font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--fog)}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--amber),transparent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.3;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+.hero-mountains{position:absolute;bottom:0;left:0;width:100%;z-index:1;pointer-events:none}
+.hero-mountains svg{display:block;width:100%}
+
+/* ========== STATS ========== */
+.stats{padding:clamp(3.5rem,8vw,7rem) 0;background:var(--bg)}
+.stats-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;
+  text-align:center;margin-bottom:2.5rem;max-width:700px;margin-left:auto;margin-right:auto;
+}
+.stat-item{
+  padding:1.2rem 0.8rem;border:1px solid rgba(92,74,50,0.25);
+  background:var(--card);position:relative;overflow:hidden;
+}
+.stat-item::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--amber),transparent);opacity:0;transition:opacity .5s
+}
+.stat-item.counted::before{opacity:1}
+.stat-number{
+  font-family:var(--heading);font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;
+  color:var(--gold);line-height:1;margin-bottom:0.2rem;
+}
+.stat-label{
+  font-size:clamp(0.65rem,1.5vw,0.75rem);color:var(--fog);letter-spacing:0.15em;
+  text-transform:uppercase;font-family:var(--heading);
+}
+/* HARD badge — full width, centered */
+.stats-badge{
+  grid-column:1/-1;padding:0.8rem 1rem;border:1px solid var(--ember);
+  background:rgba(232,98,43,0.08);display:flex;align-items:center;justify-content:center;gap:1rem;
+}
+.stats-badge .stat-number{color:var(--ember);font-size:clamp(1.3rem,3vw,1.6rem)}
+.stats-badge .stat-label{color:var(--ember)}
+.stats-quote{
+  text-align:center;font-family:var(--display);font-weight:700;
+  font-size:clamp(1.3rem,3.5vw,2rem);
+  color:var(--gold);max-width:600px;margin:0 auto;
+  padding:2rem 1rem;border-top:1px solid var(--stone);border-bottom:1px solid var(--stone);
+  letter-spacing:0.05em;
+}
+@media(min-width:768px){
+  .stats-grid{grid-template-columns:repeat(4,1fr)}
+}
+
+/* ========== TRANSPORT ========== */
+.transport{padding:clamp(3.5rem,8vw,7rem) 0;background:var(--bg2)}
+.transport-title{
+  font-family:var(--display);font-size:clamp(1.8rem,5vw,3rem);
+  text-align:center;margin-bottom:0.8rem;color:var(--bone)
+}
+.transport-depart{
+  text-align:center;color:var(--amber);font-family:var(--heading);
+  font-size:clamp(0.75rem,2vw,0.9rem);letter-spacing:0.2em;margin-bottom:2.5rem
+}
+.transport-timeline{position:relative;max-width:500px;margin:0 auto;padding-left:2.5rem}
+.tl-svg{position:absolute;left:0.6rem;top:0;width:2px;height:100%}
+.tl-bg{stroke:var(--stone);stroke-width:2}
+.tl-fill{stroke:var(--amber);stroke-width:2;stroke-linecap:round}
+.t-stop{position:relative;padding-bottom:2rem}
+.t-stop:last-child{padding-bottom:0}
+.t-dot{
+  position:absolute;left:-2.2rem;top:0.25rem;width:10px;height:10px;border-radius:50%;
+  background:var(--bg2);border:2px solid var(--stone);z-index:2;transition:all .5s
+}
+.t-stop.active .t-dot{border-color:var(--amber);background:var(--amber);box-shadow:0 0 10px rgba(196,125,46,0.5)}
+.t-name{font-family:var(--heading);font-size:clamp(0.95rem,2.5vw,1.1rem);font-weight:700;color:var(--bone)}
+.t-meta{font-size:0.85rem;color:var(--fog);margin-top:0.15rem}
+.t-meta .price{color:var(--gold);font-weight:600}
+
+/* ========== WAYPOINTS ========== */
+.day-section{padding:clamp(3.5rem,8vw,7rem) 0}
+.day-section.bg-dark{background:var(--bg)}
+.day-section.bg-warm{background:var(--bg2)}
+.day-header{text-align:center;margin-bottom:clamp(2.5rem,6vw,4rem)}
+.day-number{font-family:var(--heading);font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--amber);margin-bottom:0.4rem}
+.day-title{font-family:var(--display);font-size:clamp(2.2rem,7vw,4rem);color:var(--bone)}
+
+.waypoints{position:relative;max-width:900px;margin:0 auto}
+.wp-trail{position:absolute;left:calc(1.15rem - 1px);top:1.15rem;width:2px;height:calc(100% - 2.3rem);background:var(--stone)}
+.wp-trail-fill{width:100%;height:0%;background:linear-gradient(to bottom,var(--amber),var(--ember))}
+
+.wp{position:relative;padding-left:3.6rem;padding-bottom:clamp(2rem,5vw,3rem)}
+.wp:last-child{padding-bottom:0}
+.wp-dot{
+  position:absolute;left:0;top:0;width:2.3rem;height:2.3rem;border-radius:50%;
+  background:var(--card);border:2px solid var(--stone);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--heading);font-size:0.65rem;font-weight:700;color:var(--fog);z-index:2;
+  transition:all .5s
+}
+.wp.in-view .wp-dot{border-color:var(--amber);color:var(--amber);box-shadow:0 0 15px rgba(196,125,46,0.25)}
+
+/* Flame glow behind waypoint cards */
+.wp-card{
+  background:var(--card);border:1px solid rgba(92,74,50,0.2);overflow:hidden;
+  transition:border-color .4s,box-shadow .6s;position:relative;
+}
+.wp.in-view .wp-card{
+  border-color:rgba(196,125,46,0.25);
+  box-shadow:0 0 30px rgba(196,125,46,0.08),0 0 60px rgba(232,98,43,0.04);
+}
+/* Animated flame glow */
+.wp-card::after{
+  content:'';position:absolute;inset:-2px;z-index:-1;border-radius:2px;
+  background:linear-gradient(135deg,rgba(196,125,46,0.15),rgba(232,98,43,0.1),rgba(212,169,84,0.12));
+  opacity:0;transition:opacity .8s;filter:blur(15px);
+  animation:flameGlow 3s ease-in-out infinite alternate;
+}
+.wp.in-view .wp-card::after{opacity:1}
+@keyframes flameGlow{
+  0%{filter:blur(15px);transform:scale(1)}
+  50%{filter:blur(20px);transform:scale(1.02)}
+  100%{filter:blur(12px);transform:scale(0.98)}
+}
+
+.wp-img{position:relative;width:100%;height:180px;overflow:hidden}
+.wp-img img{width:100%;height:100%;object-fit:cover;will-change:transform;transform:scale(1.18)}
+.wp-card:hover .wp-img img{filter:brightness(1.05)}
+.img-ph{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--heading);font-size:0.7rem;letter-spacing:0.15em;color:var(--gold);text-transform:uppercase
+}
+.g-forest{background:linear-gradient(135deg,#1a2e14,#2d4a1e 50%,#1a1714)}
+.g-mountain{background:linear-gradient(135deg,#2a2520,#5c4a32 50%,#3d3529)}
+.g-summit{background:linear-gradient(135deg,#3d3529,#c47d2e 50%,#5c4a32)}
+.g-ridge{background:linear-gradient(135deg,#1a1714,#4a5e3a 50%,#2d4a1e)}
+.g-dawn{background:linear-gradient(135deg,#1a1510,#e8622b 30%,#c47d2e 70%,#d4a954)}
+.g-water{background:linear-gradient(135deg,#0e2a3a,#1a4a5a 50%,#0a1a2a)}
+.g-warm{background:linear-gradient(135deg,#2a1a0e,#5c3a1e 50%,#3a2a1a)}
+
+.wp-body{padding:clamp(0.8rem,2.5vw,1.2rem)}
+.wp-time{
+  display:inline-block;font-family:var(--heading);font-size:0.68rem;letter-spacing:0.2em;
+  color:var(--amber);background:rgba(196,125,46,0.08);padding:0.15rem 0.5rem;margin-bottom:0.4rem
+}
+.wp-name{font-family:var(--heading);font-size:clamp(1rem,2.5vw,1.2rem);font-weight:700;color:var(--bone);margin-bottom:0.2rem}
+.wp-desc{color:var(--fog);font-size:0.9rem}
+.wp-summit .wp-card{border-color:var(--gold);background:linear-gradient(135deg,var(--card),rgba(196,125,46,0.06))}
+.wp-summit .wp-dot{border-color:var(--gold);background:var(--gold);color:var(--bg)}
+
+/* Desktop: alternating left/right via flexbox */
+@media(min-width:768px){
+  .wp-trail{left:calc(50% - 1px);top:1.15rem;height:calc(100% - 2.3rem)}
+  .wp{padding-left:0;display:flex;align-items:flex-start;justify-content:center}
+  .wp-dot{position:relative;flex-shrink:0;margin:0 1.5rem}
+  .wp-card{flex:1;min-width:0;max-width:calc(50% - 2.65rem)}
+  .wp:nth-child(odd){flex-direction:row}
+  .wp:nth-child(odd) .wp-card{order:-1}
+  .wp:nth-child(odd) .wp-dot{order:0}
+  .wp:nth-child(odd)::after{content:'';flex:1;order:1;max-width:calc(50% - 2.65rem)}
+  .wp:nth-child(even){flex-direction:row}
+  .wp:nth-child(even)::before{content:'';flex:1;order:-1;max-width:calc(50% - 2.65rem)}
+  .wp:nth-child(even) .wp-dot{order:0}
+  .wp:nth-child(even) .wp-card{order:1}
+  .wp-img{height:200px}
+}
+
+/* ========== OVERNIGHT ========== */
+.overnight{padding:clamp(3.5rem,8vw,7rem) 0;background:var(--bg2);overflow:hidden}
+.overnight-header{text-align:center;margin-bottom:clamp(2rem,5vw,3.5rem)}
+.overnight-title{font-family:var(--display);font-size:clamp(1.8rem,5vw,3rem);color:var(--bone)}
+.on-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:900px;margin:0 auto}
+.on-opt{border:1px solid rgba(92,74,50,0.25);padding:clamp(1.2rem,3vw,1.8rem);background:var(--card);position:relative;overflow:hidden}
+.on-opt::before{content:'';position:absolute;inset:0;opacity:0.05;pointer-events:none}
+.on-tent::before{background:linear-gradient(135deg,var(--moss),transparent)}
+.on-hut::before{background:linear-gradient(135deg,var(--amber),transparent)}
+.on-pattern{position:absolute;pointer-events:none;opacity:0.13;mix-blend-mode:screen}
+.on-pattern.tl{top:0.6rem;left:0.6rem;width:72px;height:72px}
+.on-pattern.br{bottom:0.6rem;right:0.6rem;width:92px;height:92px;transform:rotate(180deg)}
+.on-tent .on-pattern{color:#7cb86a}
+.on-hut .on-pattern{color:var(--gold)}
+.on-opt > *:not(.on-pattern){position:relative;z-index:1}
+.on-icon{font-size:2rem;margin-bottom:0.8rem}
+.on-title{font-family:var(--heading);font-size:clamp(1.2rem,3vw,1.5rem);font-weight:700;color:var(--bone);margin-bottom:0.8rem}
+.on-tent .on-title{color:#7cb86a}
+.on-hut .on-title{color:var(--gold)}
+.on-row{padding:0.35rem 0;border-bottom:1px solid rgba(92,74,50,0.12);display:flex;justify-content:space-between;align-items:baseline;gap:0.8rem;font-size:0.9rem}
+.on-row:last-of-type{border-bottom:none}
+.on-row .l{color:var(--fog)}.on-row .v{color:var(--bone);font-weight:600;text-align:right}
+.on-note{margin-top:0.8rem;padding:0.6rem 0.8rem;background:rgba(196,125,46,0.05);border-left:2px solid var(--amber);font-size:0.85rem;color:var(--fog);font-style:italic}
+.on-vs{display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--stone);letter-spacing:0.3em}
+@media(min-width:768px){.on-grid{grid-template-columns:1fr auto 1fr;align-items:start}}
+
+/* ========== OPTIONS ========== */
+.options{padding:clamp(3.5rem,8vw,7rem) 0;background:var(--bg);overflow:hidden}
+.options-header{text-align:center;margin-bottom:clamp(1.5rem,4vw,2.5rem)}
+.options-title{font-family:var(--display);font-size:clamp(1.8rem,5vw,3rem);color:var(--bone)}
+.options-sub{color:var(--fog);font-size:clamp(0.9rem,2vw,1.05rem);margin-top:0.3rem}
+.slider-wrap{position:relative;max-width:1200px;margin:0 auto}
+.opt-slider{
+  display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;padding:1rem 24px;scroll-padding:0 24px
+}
+.opt-slider::-webkit-scrollbar{display:none}
+.opt-card{
+  flex:0 0 78vw;max-width:320px;scroll-snap-align:center;
+  background:var(--card);border:1px solid rgba(92,74,50,0.2);overflow:hidden;
+  transition:border-color .3s,transform .3s
+}
+.opt-card:hover{border-color:rgba(196,125,46,0.35);transform:translateY(-3px)}
+.opt-img{position:relative;height:170px;overflow:hidden}
+.opt-img img{width:100%;height:100%;object-fit:cover}
+.opt-emoji{position:absolute;top:0.7rem;left:0.7rem;font-size:1.6rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))}
+.opt-body{padding:clamp(0.8rem,2.5vw,1.2rem)}
+.opt-name{font-family:var(--heading);font-size:clamp(1rem,2.5vw,1.15rem);font-weight:700;color:var(--bone);margin-bottom:0.3rem}
+.opt-desc{font-size:0.85rem;color:var(--fog);margin-bottom:0.6rem;line-height:1.5}
+.opt-price{font-family:var(--heading);font-size:0.95rem;color:var(--gold);font-weight:700;margin-bottom:0.2rem}
+.opt-time{font-size:0.8rem;color:var(--fog)}
+.opt-warn{margin-top:0.5rem;padding:0.4rem 0.6rem;background:rgba(232,98,43,0.08);border-left:2px solid var(--ember);font-size:0.75rem;color:var(--ember)}
+.slider-indicators{
+  display:flex;justify-content:center;gap:1.2rem;margin-top:1.5rem;
+  font-family:var(--heading);font-size:0.75rem;letter-spacing:0.1em;color:var(--stone)
+}
+.slider-indicators button{
+  background:none;border:none;color:var(--stone);font-family:var(--heading);
+  font-size:0.8rem;cursor:pointer;padding:0.3rem;transition:color .3s
+}
+.slider-indicators button.active{color:var(--gold)}
+@media(min-width:768px){
+  .opt-card{flex:0 0 calc(33.333% - 0.75rem);max-width:none}
+  .slider-indicators{display:none}
+}
+@media(min-width:1024px){.opt-card{flex:0 0 calc(20% - 0.8rem)}}
+
+/* ========== BUDGET ========== */
+.budget{padding:clamp(3.5rem,8vw,7rem) 0;background:var(--bg2)}
+.budget-header{text-align:center;margin-bottom:clamp(1.5rem,4vw,2.5rem)}
+.budget-title{font-family:var(--display);font-size:clamp(1.8rem,5vw,3rem);color:var(--bone)}
+.budget-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:750px;margin:0 auto}
+.budget-col{background:var(--card);border:1px solid rgba(92,74,50,0.2);overflow:hidden}
+.budget-ch{padding:1rem;text-align:center;font-family:var(--heading);font-size:clamp(1rem,2.5vw,1.15rem);font-weight:700;letter-spacing:0.1em}
+.b-tent .budget-ch{background:rgba(74,94,58,0.12);color:#7cb86a;border-bottom:2px solid var(--moss)}
+.b-hut .budget-ch{background:rgba(196,125,46,0.08);color:var(--gold);border-bottom:2px solid var(--amber)}
+.budget-row{display:flex;justify-content:space-between;padding:0.6rem 1rem;border-bottom:1px solid rgba(92,74,50,0.08);font-size:0.9rem}
+.budget-row .i{color:var(--fog)}.budget-row .c{color:var(--bone);font-weight:600;font-variant-numeric:tabular-nums}
+.budget-total{display:flex;justify-content:space-between;padding:0.8rem 1rem;font-family:var(--heading);font-weight:700;font-size:1rem}
+.b-tent .budget-total{background:rgba(74,94,58,0.08);color:#7cb86a}
+.b-hut .budget-total{background:rgba(196,125,46,0.06);color:var(--gold)}
+@media(min-width:768px){.budget-grid{grid-template-columns:1fr 1fr}}
+
+/* ========== FOOTER ========== */
+.footer{padding:1.5rem 0;text-align:center;background:var(--bg);border-top:1px solid var(--stone)}
+.footer p{font-family:var(--heading);font-size:0.65rem;letter-spacing:0.3em;color:var(--stone);text-transform:uppercase}
+
+/* ========== PARTICLES ========== */
+#embers{position:fixed;inset:0;pointer-events:none;z-index:999}
+</style>
+</head>
+<body>
+
+<!-- LANG TOGGLE -->
+<button class="lang-toggle" id="lang-btn" onclick="toggleLang()">
+  <span class="active-lang">RU</span> / EN
+</button>
+
+<canvas id="embers"></canvas>
+
+<!-- ====== HERO ====== -->
+<section class="hero" id="hero">
+  <div class="hero-video-wrap">
+    <video autoplay muted loop playsinline preload="metadata"><source src="video-hero.mp4" type="video/mp4"></video>
+    <div class="hero-poster"></div>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <p class="hero-pretitle">2 Days Adventure</p>
+    <h1 class="hero-title">KUMOTORI</h1>
+    <p class="hero-subtitle"><span>2,017m</span><span>·</span><span>22 km</span><span>·</span><span data-ru="2 дня" data-en="2 days">2 дня</span></p>
+  </div>
+  <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div>
+  <div class="hero-mountains">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none" style="height:80px">
+      <path d="M0,120 L0,90 Q80,40 180,70 Q260,95 340,45 Q400,10 480,35 Q550,58 620,25 Q700,-5 790,40 Q860,70 940,30 Q1010,-2 1100,45 Q1170,72 1260,35 Q1330,8 1440,50 L1440,120Z" fill="#0a0a08"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ====== STATS ====== -->
+<section class="stats" id="stats">
+  <div class="cave-panel"><img src="cave-bg-1.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-label reveal" data-ru="Высшая точка Токио" data-en="Tokyo's Highest Peak">Высшая точка Токио</div>
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="2017" data-suffix="m">0</div>
+        <div class="stat-label" data-ru="Высота" data-en="Elevation">Высота</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="22" data-suffix=" km">0</div>
+        <div class="stat-label" data-ru="Дистанция" data-en="Distance">Дистанция</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="2" data-suffix="">0</div>
+        <div class="stat-label" data-ru="Дня" data-en="Days">Дня</div>
+      </div>
+      <div class="stat-item reveal">
+        <div class="stat-number" data-target="1500" data-suffix="m">0</div>
+        <div class="stat-label" data-ru="Набор" data-en="Ascent">Набор</div>
+      </div>
+      <div class="stats-badge reveal">
+        <div class="stat-number">HARD</div>
+        <div class="stat-label" data-ru="Сложность" data-en="Difficulty">Сложность</div>
+      </div>
+    </div>
+    <p class="stats-quote reveal">Savage Traverse</p>
+  </div>
+  <!-- Cave art decorations -->
+  <div class="cave-decor visible" style="top:8%;right:4%;width:130px;height:100px">
+    <svg viewBox="0 0 130 100" fill="var(--earth)"><path d="M65,15 L60,8 L55,2 M65,15 L70,8 L75,2 M65,15 L65,35 Q52,40 48,52 L44,70 L40,88 L46,88 L50,72 Q55,55 65,50 Q75,55 80,72 L84,88 L90,88 L86,70 Q82,52 78,40 L65,35 M55,52 L46,66 M78,52 L86,66"/></svg>
+  </div>
+  <div class="cave-decor soft" style="bottom:15%;left:3%;width:100px;height:80px">
+    <svg viewBox="0 0 100 80" fill="var(--earth)"><path d="M20,75 L50,10 L80,75 M35,50 L50,25 L65,50 M10,78 L90,78"/></svg>
+  </div>
+</section>
+
+<!-- ====== TRANSPORT ====== -->
+<section class="transport" id="transport">
+  <div class="cave-panel"><img src="cave-bg-2.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="section-label reveal" data-ru="Как добраться" data-en="Getting There">Как добраться</div>
+    <h2 class="transport-title reveal">Train Only</h2>
+    <p class="transport-depart reveal" data-ru="Выезд: 05:30 от Shinjuku" data-en="Departure: 05:30 from Shinjuku">Выезд: 05:30 от Shinjuku</p>
+    <div class="transport-timeline">
+      <svg class="tl-svg" style="position:absolute;left:0.6rem;top:0;width:2px;height:100%">
+        <line class="tl-bg" x1="1" y1="0" x2="1" y2="100%"/>
+        <line class="tl-fill" x1="1" y1="0" x2="1" y2="0%" id="tl-prog"/>
+      </svg>
+      <div class="t-stop reveal"><div class="t-dot"></div><div class="t-name">Shinjuku</div><div class="t-meta" data-ru="05:30 отправление" data-en="05:30 departure">05:30 отправление</div></div>
+      <div class="t-stop reveal"><div class="t-dot"></div><div class="t-name">Tachikawa</div><div class="t-meta" data-ru="Пересадка на Ome Line" data-en="Transfer to Ome Line">Пересадка на Ome Line</div></div>
+      <div class="t-stop reveal"><div class="t-dot"></div><div class="t-name">Ome</div><div class="t-meta" data-ru="Пересадка" data-en="Transfer">Пересадка</div></div>
+      <div class="t-stop reveal"><div class="t-dot"></div><div class="t-name">Okutama Station</div><div class="t-meta">~1ч 50мин · <span class="price">~1,340 yen</span></div></div>
+      <div class="t-stop reveal"><div class="t-dot"></div><div class="t-name">Bus → Kamosawa</div><div class="t-meta">~35 мин · <span class="price">~600 yen</span></div></div>
+    </div>
+  </div>
+  <!-- Cave art -->
+  <div class="cave-decor visible" style="bottom:10%;right:5%;width:70px;height:90px">
+    <svg viewBox="0 0 70 90" fill="var(--earth)"><circle cx="35" cy="10" r="7"/><path d="M35,17 L35,48 M35,48 L22,78 M35,48 L48,78 M35,28 L18,44 M35,28 L52,40 L56,22" stroke="var(--earth)" stroke-width="3" fill="none"/></svg>
+  </div>
+  <div class="cave-decor soft" style="top:20%;left:2%;width:60px;height:80px">
+    <svg viewBox="0 0 60 80" fill="var(--earth)"><circle cx="30" cy="10" r="6"/><path d="M30,16 L30,45 M30,45 L20,72 M30,45 L40,72 M30,28 L15,20 M15,20 Q10,35 15,50 M30,28 L50,28" stroke="var(--earth)" stroke-width="2.5" fill="none"/></svg>
+  </div>
+  <div class="cave-decor faint" style="top:50%;right:15%;width:90px;height:60px">
+    <svg viewBox="0 0 90 60" fill="var(--earth)"><path d="M10,55 L30,15 L50,55 M55,55 L75,25 L90,55 M5,58 L88,58"/></svg>
+  </div>
+</section>
+
+<!-- ====== DAY 1 ====== -->
+<section class="day-section bg-dark" id="day1">
+  <div class="cave-panel"><img src="cave-bg-3.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="day-header">
+      <div class="day-number reveal">Day One</div>
+      <h2 class="day-title reveal">Ascent</h2>
+    </div>
+    <div class="waypoints">
+      <div class="wp-trail"><div class="wp-trail-fill" id="trail1"></div></div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">01</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-start.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-forest" style="display:none">Kamosawa</div></div>
+          <div class="wp-body"><span class="wp-time">08:00</span><h3 class="wp-name">Kamosawa Bus Stop</h3><p class="wp-desc" data-ru="Старт. Деревня внизу, лес впереди." data-en="Start. Village below, forest ahead.">Старт. Деревня внизу, лес впереди.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">02</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-trail.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-forest" style="display:none">Kosode</div></div>
+          <div class="wp-body"><span class="wp-time">08:50</span><h3 class="wp-name">Kosode Trailhead</h3><p class="wp-desc" data-ru="Начало тропы. Отсюда только вверх." data-en="Trail begins. Only up from here.">Начало тропы. Отсюда только вверх.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">03</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-nanatsuishi.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-mountain" style="display:none">Nanatsuishi-goya</div></div>
+          <div class="wp-body"><span class="wp-time">10:15</span><h3 class="wp-name">Nanatsuishi-goya Junction</h3><p class="wp-desc" data-ru="Развилка. Набрать воду здесь — последняя возможность." data-en="Fork. Fill water here — last chance.">Развилка. Набрать воду здесь — последняя возможность.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">04</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-bunas.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-ridge" style="display:none">Bunasaka</div></div>
+          <div class="wp-body"><span class="wp-time">11:30</span><h3 class="wp-name">Bunasaka Ridge</h3><p class="wp-desc" data-ru="Выходишь на гребень Ishione. Первый вау-момент." data-en="You hit the Ishione Ridge. First wow moment.">Выходишь на гребень Ishione. Первый вау-момент.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">05</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-helipad.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-mountain" style="display:none">Helipad</div></div>
+          <div class="wp-body"><span class="wp-time">12:00</span><h3 class="wp-name">Okutama-goya Ruins</h3><p class="wp-desc" data-ru="Привал. Обед. Старый вертолётный pad." data-en="Rest. Lunch. Old helipad.">Привал. Обед. Старый вертолётный pad.</p></div>
+        </div>
+      </div>
+
+      <div class="wp wp-summit reveal">
+        <div class="wp-dot">&#9650;</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-summit.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-summit" style="display:none">SUMMIT 2,017m</div></div>
+          <div class="wp-body"><span class="wp-time">13:30</span><h3 class="wp-name">Kumotori Summit — 2,017m</h3><p class="wp-desc" data-ru="ВЕРШИНА. Высшая точка Токио. Фудзи, Альпы, всё." data-en="THE TOP. Tokyo's highest. Fuji, Alps, everything.">ВЕРШИНА. Высшая точка Токио. Фудзи, Альпы, всё.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">07</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-hut.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-warm" style="display:none">Mountain Hut</div></div>
+          <div class="wp-body"><span class="wp-time">14:00</span><h3 class="wp-name">Kumotori-sanso Hut</h3><p class="wp-desc" data-ru="Спуск 20 мин от вершины. Лагерь на ночь." data-en="20 min descent from summit. Camp for the night.">Спуск 20 мин от вершины. Лагерь на ночь.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Cave art -->
+  <div class="cave-decor visible" style="bottom:3%;right:3%;width:90px;height:70px">
+    <svg viewBox="0 0 90 70" fill="var(--earth)"><path d="M25,65 L65,65 M30,65 L30,48 Q28,38 33,28 Q38,16 45,8 Q52,16 57,28 Q62,38 60,48 L60,65 M40,65 L40,42 Q45,30 50,42 L50,65"/></svg>
+  </div>
+  <div class="cave-decor soft" style="top:15%;left:2%;width:50px;height:60px">
+    <svg viewBox="0 0 50 60" fill="var(--earth)"><path d="M25,55 L25,30 M25,30 L18,12 M25,30 L22,10 M25,30 L25,8 M25,30 L28,10 M25,30 L32,14 M18,30 Q14,35 16,42 M32,30 Q36,35 34,42"/></svg>
+  </div>
+  <div class="cave-decor faint" style="top:45%;right:8%;width:45px;height:55px">
+    <svg viewBox="0 0 50 60" fill="var(--earth)"><path d="M25,55 L25,30 M25,30 L18,12 M25,30 L22,10 M25,30 L25,8 M25,30 L28,10 M25,30 L32,14"/></svg>
+  </div>
+  <div class="cave-decor soft" style="bottom:35%;left:6%;width:80px;height:50px">
+    <svg viewBox="0 0 80 50" fill="var(--earth)"><path d="M5,45 L20,10 L35,30 L50,5 L65,25 L80,10 M5,48 L80,48"/></svg>
+  </div>
+</section>
+
+<!-- ====== OVERNIGHT ====== -->
+<section class="overnight" id="overnight">
+  <!-- Video background -->
+  <div class="hero-video-wrap" style="z-index:0">
+    <video autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover"><source src="video-camp.mp4" type="video/mp4"></video>
+  </div>
+  <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(18,16,14,0.85)0%,rgba(18,16,14,0.75)50%,rgba(18,16,14,0.9)100%)"></div>
+  <div class="container" style="position:relative;z-index:2">
+    <div class="overnight-header">
+      <div class="section-label reveal" data-ru="Ночёвка на 2,000м" data-en="Camp at 2,000m">Ночёвка на 2,000м</div>
+      <h2 class="overnight-title reveal" data-ru="Где спать?" data-en="Where to Sleep?">Где спать?</h2>
+    </div>
+    <div class="on-grid">
+      <div class="on-opt on-tent reveal">
+        <svg class="on-pattern tl" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M10 80 L50 15 L90 80 Z"/>
+          <path d="M25 80 L50 40 L75 80"/>
+          <path d="M50 15 L50 80"/>
+          <circle cx="50" cy="55" r="3" fill="currentColor"/>
+          <path d="M15 88 L85 88 M20 94 L80 94" stroke-dasharray="3 4"/>
+        </svg>
+        <svg class="on-pattern br" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M20 70 Q30 40 50 50 Q70 60 80 30"/>
+          <path d="M15 85 L85 85" stroke-dasharray="2 5"/>
+          <path d="M30 20 L35 30 M45 15 L50 25 M60 20 L65 30"/>
+          <circle cx="25" cy="55" r="2" fill="currentColor"/>
+          <circle cx="75" cy="45" r="2" fill="currentColor"/>
+        </svg>
+        <div class="on-icon">&#9978;</div>
+        <h3 class="on-title" data-ru="Палатка" data-en="Tent">Палатка</h3>
+        <div class="on-row"><span class="l">Gojunindaira Camp</span><span class="v" data-ru="2,000 иен/чел" data-en="2,000 yen/person">2,000 иен/чел</span></div>
+        <div class="on-row"><span class="l">Kumotori-sanso Camp</span><span class="v" data-ru="1,500 иен/чел" data-en="1,500 yen/person">1,500 иен/чел</span></div>
+        <div class="on-row"><span class="l" data-ru="Наша палатка" data-en="Our tent">Наша палатка</span><span class="v" data-ru="На 4 чел. 2 места свободны." data-en="Fits 4. 2 spots free.">На 4 чел. 2 места свободны.</span></div>
+        <div class="on-note" data-ru="Остальным: искать палатки у знакомых или аренда ~1,500 иен. Gojunindaira — нужна онлайн-бронь. Kumotori-sanso — без брони, платишь на месте." data-en="Others: borrow a tent or rent ~1,500 yen. Gojunindaira requires online booking. Kumotori-sanso — pay on site.">Остальным: искать палатки у знакомых или аренда ~1,500 иен. Gojunindaira — нужна онлайн-бронь. Kumotori-sanso — без брони, платишь на месте.</div>
+      </div>
+      <div class="on-vs">VS</div>
+      <div class="on-opt on-hut reveal">
+        <svg class="on-pattern tl" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M15 85 L15 45 L50 15 L85 45 L85 85 Z"/>
+          <path d="M35 85 L35 60 L65 60 L65 85"/>
+          <path d="M50 15 L50 45"/>
+          <path d="M20 90 L80 90" stroke-dasharray="2 4"/>
+          <circle cx="50" cy="35" r="2" fill="currentColor"/>
+        </svg>
+        <svg class="on-pattern br" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M20 75 Q35 55 50 75 Q65 55 80 75"/>
+          <path d="M25 55 L30 45 L35 55 M45 50 L50 40 L55 50 M65 55 L70 45 L75 55"/>
+          <path d="M15 85 L85 85" stroke-dasharray="3 4"/>
+          <path d="M50 15 L50 30 M42 22 L58 22"/>
+          <circle cx="30" cy="30" r="2" fill="currentColor"/>
+          <circle cx="70" cy="30" r="2" fill="currentColor"/>
+        </svg>
+        <div class="on-icon">&#127968;</div>
+        <h3 class="on-title" data-ru="Приют Kumotori-sanso" data-en="Kumotori-sanso Hut">Приют Kumotori-sanso</h3>
+        <div class="on-row"><span class="l" data-ru="1 ночь + ужин + завтрак" data-en="1 night + dinner + breakfast">1 ночь + ужин + завтрак</span><span class="v" data-ru="9,500 иен" data-en="9,500 yen">9,500 иен</span></div>
+        <div class="on-row"><span class="l" data-ru="Без еды" data-en="No meals">Без еды</span><span class="v" data-ru="6,800 иен" data-en="6,800 yen">6,800 иен</span></div>
+        <div class="on-row"><span class="l" data-ru="Ужин отдельно" data-en="Dinner only">Ужин отдельно</span><span class="v">+1,600</span></div>
+        <div class="on-row"><span class="l" data-ru="Завтрак отдельно" data-en="Breakfast only">Завтрак отдельно</span><span class="v">+1,100</span></div>
+        <div class="on-row"><span class="l" data-ru="Индивид. комната (вых.)" data-en="Private room (weekend)">Индивид. комната (вых.)</span><span class="v">+4,000</span></div>
+        <div class="on-note" data-ru="Бронь: email или тел. 0494-23-3338. Только наличные. Прийти до 18:00. Плюсы: тепло, горячая еда, футоны, котацу, вода рядом." data-en="Book: email or call 0494-23-3338. Cash only. Arrive by 18:00. Perks: warm, hot food, futons, kotatsu, water nearby.">Бронь: email или тел. 0494-23-3338. Только наличные. Прийти до 18:00. Плюсы: тепло, горячая еда, футоны, котацу, вода рядом.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== DAY 2 ====== -->
+<section class="day-section bg-warm" id="day2">
+  <div class="cave-panel"><img src="cave-bg-4.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="day-header">
+      <div class="day-number reveal">Day Two</div>
+      <h2 class="day-title reveal">Traverse</h2>
+    </div>
+    <div class="waypoints">
+      <div class="wp-trail"><div class="wp-trail-fill" id="trail2"></div></div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">08</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-dawn.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-dawn" style="display:none">Dawn</div></div>
+          <div class="wp-body"><span class="wp-time">04:30</span><h3 class="wp-name" data-ru="Подъём" data-en="Wake Up">Подъём</h3><p class="wp-desc" data-ru="Рассвет над облаками. Другой мир." data-en="Sunrise above the clouds. A different world.">Рассвет над облаками. Другой мир.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">09</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-sunrise.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-dawn" style="display:none">Sunrise</div></div>
+          <div class="wp-body"><span class="wp-time">05:00</span><h3 class="wp-name" data-ru="Снова на вершину" data-en="Back to the Summit">Снова на вершину</h3><p class="wp-desc" data-ru="Восход с 2,017м." data-en="Sunrise from 2,017m.">Восход с 2,017м.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">10</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-ridge.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-ridge" style="display:none">Ishione Ridge</div></div>
+          <div class="wp-body"><span class="wp-time">06:30</span><h3 class="wp-name">Ishione Ridge</h3><p class="wp-desc" data-ru="15 км по гребню с видом на Фудзи весь день." data-en="15 km ridgeline with Fuji views all day.">15 км по гребню с видом на Фудзи весь день.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">11</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-nanatsuishi-peak.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-mountain" style="display:none">Nanatsuishi</div></div>
+          <div class="wp-body"><span class="wp-time">07:30</span><h3 class="wp-name">Nanatsuishi Peak — 1,757m</h3><p class="wp-desc" data-ru="Вершина по пути. Отличный вид." data-en="Summit along the way. Great views.">Вершина по пути. Отличный вид.</p></div>
+        </div>
+      </div>
+
+      <div class="wp reveal">
+        <div class="wp-dot">12</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-descent.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-forest" style="display:none">Descent</div></div>
+          <div class="wp-body"><span class="wp-time">11:30</span><h3 class="wp-name" data-ru="Спуск к Okutama" data-en="Descent to Okutama">Спуск к Okutama</h3><p class="wp-desc" data-ru="Лес, река, деревня." data-en="Forest, river, village.">Лес, река, деревня.</p></div>
+        </div>
+      </div>
+
+      <div class="wp wp-summit reveal">
+        <div class="wp-dot">&#10003;</div>
+        <div class="wp-card">
+          <div class="wp-img"><img src="img-finish.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="img-ph g-summit" style="display:none">FINISH</div></div>
+          <div class="wp-body"><span class="wp-time">13:00</span><h3 class="wp-name" data-ru="Okutama Station — ФИНИШ" data-en="Okutama Station — FINISH">Okutama Station — ФИНИШ</h3><p class="wp-desc" data-ru="Ты прошёл насквозь." data-en="You walked all the way through.">Ты прошёл насквозь.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Cave art -->
+  <div class="cave-decor visible" style="top:10%;left:3%;width:120px;height:80px">
+    <svg viewBox="0 0 120 80" fill="var(--earth)"><path d="M30,25 L25,15 L20,8 M30,25 L35,15 L40,8 M30,25 L45,30 Q55,32 65,28 Q75,25 85,30 L85,40 Q80,50 75,55 L70,70 L76,70 L80,58 Q85,48 90,50 L95,70 L101,70 L95,48 Q90,38 85,35 M45,35 Q40,45 35,55 L30,70 L36,70 L40,58 Q42,50 45,48 L50,70 L56,70 L52,48"/></svg>
+  </div>
+  <div class="cave-decor soft" style="top:5%;right:5%;width:60px;height:60px">
+    <svg viewBox="0 0 60 60" fill="none" stroke="var(--earth)" stroke-width="2"><circle cx="30" cy="30" r="10"/><line x1="30" y1="5" x2="30" y2="15"/><line x1="30" y1="45" x2="30" y2="55"/><line x1="5" y1="30" x2="15" y2="30"/><line x1="45" y1="30" x2="55" y2="30"/><line x1="12" y1="12" x2="19" y2="19"/><line x1="41" y1="41" x2="48" y2="48"/><line x1="48" y1="12" x2="41" y2="19"/><line x1="12" y1="48" x2="19" y2="41"/></svg>
+  </div>
+  <div class="cave-decor faint" style="bottom:20%;right:10%;width:70px;height:50px">
+    <svg viewBox="0 0 70 50" fill="var(--earth)"><path d="M10,45 Q20,20 35,10 Q50,20 60,45 M20,45 Q30,25 35,18 Q40,25 50,45 M5,48 L65,48"/></svg>
+  </div>
+</section>
+
+<!-- ====== OPTIONS ====== -->
+<section class="options" id="options">
+  <div class="container">
+    <div class="options-header">
+      <div class="section-label reveal" data-ru="После финиша" data-en="After the Finish">После финиша</div>
+      <h2 class="options-title reveal">Options</h2>
+      <p class="options-sub reveal" data-ru="Ты спустился. Теперь выбирай." data-en="You made it down. Now choose.">Ты спустился. Теперь выбирай.</p>
+    </div>
+  </div>
+  <div class="slider-wrap">
+    <div class="opt-slider" id="opt-slider">
+      <div class="opt-card reveal">
+        <div class="opt-img"><img src="img-rafting.png" alt="" onerror="this.style.display='none';this.parentElement.classList.add('img-ph','g-water')"><span class="opt-emoji">&#128758;</span></div>
+        <div class="opt-body">
+          <h3 class="opt-name">Rafting</h3>
+          <p class="opt-desc" data-ru="Группа в надувной лодке. Пороги. Прыжки со скал." data-en="Inflatable raft. Rapids. Cliff jumps.">Группа в надувной лодке. Пороги. Прыжки со скал.</p>
+          <div class="opt-price" data-ru="3,900–5,000 иен/чел" data-en="3,900–5,000 yen/person">3,900–5,000 иен/чел</div>
+          <div class="opt-time">~1.5 ч</div>
+          <div class="opt-warn" data-ru="&#9888; Последний слот 13:15 — быть у Mitake Station до 12:50 (5 мин поездом от Okutama)" data-en="&#9888; Last slot 13:15 — be at Mitake Station by 12:50 (5 min train from Okutama)">&#9888; Последний слот 13:15 — быть у Mitake Station до 12:50 (5 мин поездом от Okutama)</div>
+        </div>
+      </div>
+      <div class="opt-card reveal">
+        <div class="opt-img"><img src="img-kayak.png" alt="" onerror="this.style.display='none';this.parentElement.classList.add('img-ph','g-water')"><span class="opt-emoji">&#128675;</span></div>
+        <div class="opt-body">
+          <h3 class="opt-name">Kayak</h3>
+          <p class="opt-desc" data-ru="Изумрудное озеро. Один человек. Сам гребёшь." data-en="Emerald lake. Solo. You paddle.">Изумрудное озеро. Один человек. Сам гребёшь.</p>
+          <div class="opt-price" data-ru="3,000–5,000 иен/чел" data-en="3,000–5,000 yen/person">3,000–5,000 иен/чел</div>
+          <div class="opt-time" data-ru="2 часа · Shiromaru Station" data-en="2 hours · Shiromaru Station">2 часа · Shiromaru Station</div>
+        </div>
+      </div>
+      <div class="opt-card reveal">
+        <div class="opt-img"><img src="img-sup.png" alt="" onerror="this.style.display='none';this.parentElement.classList.add('img-ph','g-water')"><span class="opt-emoji">&#127940;</span></div>
+        <div class="opt-body">
+          <h3 class="opt-name">SUP</h3>
+          <p class="opt-desc" data-ru="Стоя на доске с веслом. Река Тама." data-en="Stand-up paddleboard. Tama River.">Стоя на доске с веслом. Река Тама.</p>
+          <div class="opt-price" data-ru="5,500 иен/чел" data-en="5,500 yen/person">5,500 иен/чел</div>
+          <div class="opt-time">2–3 ч</div>
+        </div>
+      </div>
+      <div class="opt-card reveal">
+        <div class="opt-img"><img src="img-onsen.png" alt="" onerror="this.style.display='none';this.parentElement.classList.add('img-ph','g-warm')"><span class="opt-emoji">&#9832;</span></div>
+        <div class="opt-body">
+          <h3 class="opt-name">Onsen</h3>
+          <p class="opt-desc" data-ru="Горячая вода после 2 дней в горах. Moegi-no-Yu — 5 мин от станции." data-en="Hot spring after 2 days. Moegi-no-Yu — 5 min from station.">Горячая вода после 2 дней в горах. Moegi-no-Yu — 5 мин от станции.</p>
+          <div class="opt-price" data-ru="1,000 иен" data-en="1,000 yen">1,000 иен</div>
+          <div class="opt-time" data-ru="Закрывается 18:30" data-en="Closes 18:30">Закрывается 18:30</div>
+        </div>
+      </div>
+      <div class="opt-card reveal">
+        <div class="opt-img"><img src="img-beer.png" alt="" onerror="this.style.display='none';this.parentElement.classList.add('img-ph','g-warm')"><span class="opt-emoji">&#127866;</span></div>
+        <div class="opt-body">
+          <h3 class="opt-name">Craft Beer</h3>
+          <p class="opt-desc" data-ru="Легендарная пивоварня VERTERE прямо у станции." data-en="Legendary VERTERE brewery right at the station.">Легендарная пивоварня VERTERE прямо у станции.</p>
+          <div class="opt-price" data-ru="800–1,200 иен/пинта" data-en="800–1,200 yen/pint">800–1,200 иен/пинта</div>
+          <div class="opt-time" data-ru="Без ограничений" data-en="No time limit">Без ограничений</div>
+        </div>
+      </div>
+    </div>
+    <div class="slider-indicators" id="slider-ind"></div>
+  </div>
+</section>
+
+<!-- ====== BUDGET ====== -->
+<section class="budget" id="budget">
+  <div class="container">
+    <div class="budget-header">
+      <div class="section-label reveal" data-ru="Расходы" data-en="Cost Breakdown">Расходы</div>
+      <h2 class="budget-title reveal" data-ru="Бюджет" data-en="Budget">Бюджет</h2>
+    </div>
+    <div class="budget-grid">
+      <div class="budget-col b-tent reveal">
+        <div class="budget-ch" data-ru="&#9978; Палатка" data-en="&#9978; Tent">&#9978; Палатка</div>
+        <div class="budget-row"><span class="i" data-ru="Поезд (туда-обратно)" data-en="Train (round trip)">Поезд (туда-обратно)</span><span class="c">2,680 yen</span></div>
+        <div class="budget-row"><span class="i" data-ru="Автобус" data-en="Bus">Автобус</span><span class="c">600 yen</span></div>
+        <div class="budget-row"><span class="i" data-ru="Ночёвка" data-en="Camping">Ночёвка</span><span class="c">1,500–2,000 yen</span></div>
+        <div class="budget-row"><span class="i" data-ru="Еда на 2 дня" data-en="Food (2 days)">Еда на 2 дня</span><span class="c">2,000 yen</span></div>
+        <div class="budget-total"><span data-ru="ИТОГО" data-en="TOTAL">ИТОГО</span><span>~6,780–7,280 yen</span></div>
+      </div>
+      <div class="budget-col b-hut reveal">
+        <div class="budget-ch" data-ru="&#127968; Приют" data-en="&#127968; Hut">&#127968; Приют</div>
+        <div class="budget-row"><span class="i" data-ru="Поезд (туда-обратно)" data-en="Train (round trip)">Поезд (туда-обратно)</span><span class="c">2,680 yen</span></div>
+        <div class="budget-row"><span class="i" data-ru="Автобус" data-en="Bus">Автобус</span><span class="c">600 yen</span></div>
+        <div class="budget-row"><span class="i" data-ru="Ночёвка" data-en="Hut stay">Ночёвка</span><span class="c">6,800–9,500 yen</span></div>
+        <div class="budget-row"><span class="i" data-ru="Еда на 2 дня" data-en="Food (2 days)">Еда на 2 дня</span><span class="c">500 yen</span></div>
+        <div class="budget-total"><span data-ru="ИТОГО" data-en="TOTAL">ИТОГО</span><span>~10,580–13,280 yen</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer"><p>2 Days Adventure · Kumotori 2,017m</p></footer>
+
+<!-- ========== SCRIPTS ========== -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+<script>
+/* ========== LANGUAGE TOGGLE ========== */
+let currentLang='ru';
+function toggleLang(){
+  currentLang=currentLang==='ru'?'en':'ru';
+  document.querySelectorAll('[data-ru][data-en]').forEach(el=>{
+    el.textContent=el.dataset[currentLang];
+  });
+  const btn=document.getElementById('lang-btn');
+  btn.innerHTML=currentLang==='ru'
+    ?'<span class="active-lang">RU</span> / EN'
+    :'RU / <span class="active-lang">EN</span>';
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const mob=window.matchMedia('(max-width:767px)').matches;
+  const noMotion=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.ticker.lagSmoothing(1000,16);
+
+  // Video fallback
+  const vid=document.querySelector('.hero-video-wrap video');
+  const poster=document.querySelector('.hero-poster');
+  if(vid){
+    const fail=()=>{vid.style.display='none';if(poster)poster.style.display='block'};
+    vid.addEventListener('error',fail);
+    const src=vid.querySelector('source');if(src)src.addEventListener('error',fail);
+  }
+
+  // Hero
+  gsap.set('.hero-pretitle',{y:15});gsap.set('.hero-subtitle',{y:12});
+  gsap.timeline({delay:0.3})
+    .to('.hero-pretitle',{opacity:1,y:0,duration:0.7,ease:'power2.out'})
+    .to('.hero-title',{opacity:1,scale:1,duration:1,ease:'power3.out'},'-=0.3')
+    .to('.hero-subtitle',{opacity:1,y:0,duration:0.7,ease:'power2.out'},'-=0.3')
+    .to('.hero-scroll',{opacity:1,duration:0.5},'-=0.1');
+
+  // Reveals
+  ScrollTrigger.batch('.reveal',{
+    onEnter:b=>gsap.to(b,{opacity:1,y:0,stagger:0.1,duration:0.7,ease:'power2.out',overwrite:true}),
+    start:'top 88%',once:true
+  });
+
+  // Counters
+  ScrollTrigger.create({trigger:'#stats',start:'top 75%',once:true,onEnter:()=>{
+    document.querySelectorAll('.stat-number[data-target]').forEach(el=>{
+      const t=+el.dataset.target,s=el.dataset.suffix||'',o={v:0};
+      gsap.to(o,{v:t,duration:1.8,ease:'power2.out',
+        onUpdate:()=>{el.textContent=Math.round(o.v).toLocaleString()+s},
+        onComplete:()=>{el.textContent=t.toLocaleString()+s;el.closest('.stat-item')?.classList.add('counted')}
+      });
+    });
+  }});
+
+  // Transport line
+  const tlP=document.getElementById('tl-prog'),stops=document.querySelectorAll('.t-stop');
+  if(tlP&&stops.length)ScrollTrigger.create({
+    trigger:'.transport-timeline',start:'top 80%',end:'bottom 40%',scrub:1,
+    onUpdate:s=>{tlP.setAttribute('y2',~~(s.progress*100)+'%');
+      stops.forEach((st,i)=>{if(s.progress>=i/(stops.length-1))st.classList.add('active')});}
+  });
+
+  // Trails
+  ['#day1','#day2'].forEach(id=>{
+    const sec=document.querySelector(id);if(!sec)return;
+    const fill=sec.querySelector('.wp-trail-fill'),wps=sec.querySelectorAll('.wp');
+    if(!fill)return;
+    ScrollTrigger.create({trigger:sec.querySelector('.waypoints'),start:'top 70%',end:'bottom 30%',scrub:1,
+      onUpdate:s=>{fill.style.height=(s.progress*100)+'%';
+        wps.forEach((w,i)=>{if(s.progress>=i/(wps.length-1)*0.9)w.classList.add('in-view')});}
+    });
+  });
+
+  // Parallax zoom on waypoint images
+  document.querySelectorAll('.wp-img img, .opt-img img').forEach(img=>{
+    gsap.fromTo(img,{scale:1.22},{scale:1.02,ease:'none',
+      scrollTrigger:{trigger:img.closest('.wp-img,.opt-img'),start:'top bottom',end:'bottom top',scrub:1.2}});
+  });
+
+  // Overnight split
+  if(!mob){
+    gsap.from('.on-tent',{x:-60,opacity:0,duration:0.7,ease:'power2.out',scrollTrigger:{trigger:'#overnight',start:'top 70%',once:true}});
+    gsap.from('.on-hut',{x:60,opacity:0,duration:0.7,ease:'power2.out',scrollTrigger:{trigger:'#overnight',start:'top 70%',once:true}});
+  }
+
+  // Options slider indicators
+  const slider=document.getElementById('opt-slider'),ind=document.getElementById('slider-ind');
+  const cards=slider?slider.querySelectorAll('.opt-card'):[];
+  const rom=['I','II','III','IV','V'];
+  if(ind&&cards.length){
+    cards.forEach((_,i)=>{const b=document.createElement('button');b.textContent=rom[i]||i+1;
+      if(i===0)b.classList.add('active');
+      b.addEventListener('click',()=>cards[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}));
+      ind.appendChild(b);
+    });
+    if(mob){const bs=ind.querySelectorAll('button');
+      const obs=new IntersectionObserver(es=>{es.forEach(e=>{
+        if(e.isIntersecting){const idx=[...cards].indexOf(e.target);bs.forEach((b,i)=>b.classList.toggle('active',i===idx))}
+      })},{root:slider,threshold:0.6});
+      cards.forEach(c=>obs.observe(c));
+    }
+  }
+
+  // Cave art parallax
+  if(!noMotion)gsap.utils.toArray('.cave-decor').forEach(el=>{
+    gsap.to(el,{y:mob?-20:-50,scrollTrigger:{trigger:el.closest('section')||el.parentElement,scrub:1.5}});
+  });
+
+  // Embers
+  if(!noMotion){
+    const cv=document.getElementById('embers'),cx=cv.getContext('2d');
+    let em=[];const mx=mob?12:35,sk=mob?2:1;let fc=0,vis=true;
+    function rs(){const d=Math.min(devicePixelRatio||1,2);cv.width=innerWidth*d;cv.height=innerHeight*d;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';cx.scale(d,d)}
+    rs();addEventListener('resize',rs);
+    document.addEventListener('visibilitychange',()=>{vis=!document.hidden});
+    class E{constructor(){this.reset()}
+      reset(){this.x=Math.random()*innerWidth;this.y=innerHeight+10+Math.random()*40;this.sz=Math.random()*2.2+0.5;this.sy=-(Math.random()*0.5+0.12);this.sx=Math.random()*0.25-0.125;this.op=Math.random()*0.45+0.12;this.dc=Math.random()*0.0018+0.0006;this.r=185+Math.random()*70;this.g=75+Math.random()*65;this.b=12+Math.random()*30;this.ws=Math.random()*0.018+0.004;this.wa=Math.random()*0.7+0.2;this.t=0}
+      up(){this.t++;this.y+=this.sy;this.x+=this.sx+Math.sin(this.t*this.ws)*this.wa;this.op-=this.dc;if(this.op<=0||this.y<-20)this.reset()}
+      draw(c){c.beginPath();c.arc(this.x,this.y,this.sz,0,Math.PI*2);c.fillStyle=`rgba(${~~this.r},${~~this.g},${~~this.b},${this.op})`;c.fill();if(this.sz>1.3){c.beginPath();c.arc(this.x,this.y,this.sz*2.5,0,Math.PI*2);c.fillStyle=`rgba(${~~this.r},${~~this.g},${~~this.b},${this.op*0.12})`;c.fill()}}
+    }
+    for(let i=0;i<mx;i++){const e=new E();e.y=Math.random()*innerHeight;e.t=Math.random()*400;em.push(e)}
+    (function a(){requestAnimationFrame(a);if(!vis)return;fc++;if(fc%sk!==0)return;cx.clearRect(0,0,innerWidth,innerHeight);em.forEach(e=>{e.up();e.draw(cx)})})();
+  }
+
+  window.addEventListener('load',()=>ScrollTrigger.refresh());
+});
+</script>
+</body>
+</html>
