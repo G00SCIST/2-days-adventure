@@ -57,12 +57,34 @@ section{position:relative}
 .cave-decor.soft{opacity:0.1}
 .cave-decor.visible{opacity:0.14}
 .cave-panel{
-  position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;opacity:0.07;
+  position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;opacity:0.32;
 }
 .cave-panel img{
   width:100%;height:100%;object-fit:cover;
-  filter:sepia(1) brightness(0.4) contrast(1.2);mix-blend-mode:lighten;
+  filter:sepia(0.7) saturate(1.3) brightness(1.1) contrast(1.4) hue-rotate(-8deg);
+  mix-blend-mode:screen;
+  -webkit-mask-image:radial-gradient(ellipse 92% 80% at center,#000 35%,transparent 96%);
+  mask-image:radial-gradient(ellipse 92% 80% at center,#000 35%,transparent 96%);
 }
+.cave-panel::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(to bottom,#0a0a08 0%,rgba(10,10,8,0) 14%,rgba(10,10,8,0) 82%,#0a0a08 100%),
+    linear-gradient(to right,#0a0a08 0%,rgba(10,10,8,0) 10%,rgba(10,10,8,0) 90%,#0a0a08 100%);
+}
+/* slightly heavier bottom fade for warm sections (traverse/finish) so they blend into next */
+.day-section.bg-warm .cave-panel::after,
+.budget .cave-panel::after{
+  background:
+    linear-gradient(to bottom,#12100e 0%,rgba(18,16,14,0) 14%,rgba(18,16,14,0) 82%,#12100e 100%),
+    linear-gradient(to right,#12100e 0%,rgba(18,16,14,0) 10%,rgba(18,16,14,0) 90%,#12100e 100%);
+}
+.day-section.bg-warm .cave-panel::after{
+  background:
+    linear-gradient(to bottom,#12100e 0%,rgba(18,16,14,0) 14%,rgba(18,16,14,0) 68%,#12100e 100%),
+    linear-gradient(to right,#12100e 0%,rgba(18,16,14,0) 10%,rgba(18,16,14,0) 90%,#12100e 100%);
+}
+@media(max-width:767px){.cave-panel{opacity:0.4}}
 
 /* ========== HERO ========== */
 .hero{
@@ -781,7 +803,8 @@ section{position:relative}
 
 <!-- ====== BUDGET ====== -->
 <section class="budget" id="budget">
-  <div class="container">
+  <div class="cave-panel"><img src="cave-bg-budget.png" alt="" onerror="this.parentElement.style.display='none'"></div>
+  <div class="container" style="position:relative;z-index:1">
     <div class="budget-header">
       <div class="section-label reveal" data-ru="Расходы" data-en="Cost Breakdown">Расходы</div>
       <h2 class="budget-title reveal" data-ru="Бюджет" data-en="Budget">Бюджет</h2>
